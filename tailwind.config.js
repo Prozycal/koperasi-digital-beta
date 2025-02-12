@@ -12,6 +12,10 @@ module.exports = {
         'creamyLight': '#f8fac3',
         'navyDarkest': '#1d2040'
       },
+      fontFamily: {
+        typographica: ['Typographica', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
+      },
     },
   },
   plugins: [],

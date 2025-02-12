@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from 'react';
+import logo from './assets/yellow-icon.png';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,7 +9,7 @@ function Navbar() {
     <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-snavy bg-opacity-80 backdrop-blur-lg shadow-lg rounded-full w-5/6 px-6 py-6 z-50">
       <div className="container mx-auto flex justify-between items-center">
         <a href="#" className="text-lg font-bold text-creamyLight">
-          Koperasi Digital
+          <img src={logo} alt="logo" className="h-11 w-20 inline-block" />
         </a>
         <div className="hidden lg:flex lg:items-center space-x-6">
         <a href="#home" className="text-creamy relative after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-current after:transition-width after:duration-300 hover:after:w-full">Home</a>

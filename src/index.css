@@ -1,7 +1,63 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Reenie+Beanie&display=swap');
 
 html {
     scroll-behavior: smooth;
+    font-family: "Poppins", serif;
+    font-weight: 300;
+  }
+
+  @font-face {
+    font-family: 'Typographica';
+    src: url('/src/components/assets/fonts/TypoGraphica_demo.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  .particles {
+    position: absolute;
+    top: -60px;
+    left: 0;
+    right: 0;
+    width: 96%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.127) 10%, transparent 10.01%);
+    background-size: 30px 30px;
+    animation: moveParticles 10s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  @keyframes moveParticles {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+      transform: translate(10px, 10px) rotate(5deg);
+    }
+    50% {
+      transform: translate(-10px, -10px) rotate(-5deg);
+    }
+    75% {
+      transform: translate(5px, -5px) rotate(10deg);
+    }
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .particles {
+      width: 80%;
+    }
+  }
+
+  @layer base {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
   }

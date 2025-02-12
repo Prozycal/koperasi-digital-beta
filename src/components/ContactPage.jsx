@@ -16,26 +16,26 @@ function ContactPage() {
 
             <div className="flex items-center gap-4 mb-4">
               <FiMail className="text-creamyLight text-xl" />
-              <p className="text-gray-300">info@company.com</p>
+              <p className="text-gray-300">konest@gmail.com</p>
             </div>
             <div className="flex items-center gap-4 mb-4">
               <FiPhone className="text-creamyLight text-xl" />
-              <p className="text-gray-300">+62 812 3456 7890</p>
+              <p className="text-gray-300">+62 856-4756-8494</p>
             </div>
             <div className="flex items-center gap-4">
               <FiMapPin className="text-creamyLight text-xl" />
-              <p className="text-gray-300">Jl. Contoh No.123, Jakarta, Indonesia</p>
+              <p className="text-gray-300">Jl. STM Pembangunan, Mrican, Caturtunggal, Depok, Sleman 55281</p>
             </div>
 
             <div className="mt-6">
-              <h4 className="text-lg text-white mb-2">Jam Operasional</h4>
-              <p className="text-gray-300">Senin - Jumat: 09:00 - 17:00</p>
+              <h4 className="text-lg text-white mb-2">Jam Operasional Koperasi Siswa</h4>
+              <p className="text-gray-300">Senin - Jumat: 10:00 - 14:00</p>
               <p className="text-gray-300">Sabtu - Minggu: Libur</p>
             </div>
           </div>
 
           {/* Formulir Kontak */}
-          <form className="bg-navyDarkest p-8 rounded-lg shadow-lg">
+          <form action="https://formsubmit.co/przycal@gmail.com" className="bg-navyDarkest p-8 rounded-lg shadow-lg" method="POST">
             <h3 className="text-2xl font-semibold text-white mb-6">Kirim Pesan</h3>
 
             <div className="mb-4">
@@ -44,7 +44,7 @@ function ContactPage() {
                 type="text"
                 id="name"
                 placeholder="Masukkan nama Anda"
-                className="w-full px-4 py-3 border border-gray-600 bg-navyDark focus:outline-none focus:ring-2 focus:ring-creamyLight text-gray-300 rounded-md"
+                className="w-full px-4 py-3 border border-gray-600 bg-navyDark focus:outline-none focus:ring-2 focus:ring-creamyLight text-gray-300 rounded-md" required
               />
             </div>
 
@@ -54,7 +54,7 @@ function ContactPage() {
                 type="email"
                 id="email"
                 placeholder="Masukkan email Anda"
-                className="w-full px-4 py-3 border border-gray-600 bg-navyDark focus:outline-none focus:ring-2 focus:ring-creamyLight text-gray-300 rounded-md"
+                className="w-full px-4 py-3 border border-gray-600 bg-navyDark focus:outline-none focus:ring-2 focus:ring-creamyLight text-gray-300 rounded-md" required
               />
             </div>
 
@@ -64,7 +64,7 @@ function ContactPage() {
                 id="message"
                 rows="5"
                 placeholder="Tulis pesan Anda di sini..."
-                className="w-full px-4 py-3 border border-gray-600 bg-navyDark focus:outline-none focus:ring-2 focus:ring-creamyLight text-gray-300 rounded-md"
+                className="w-full px-4 py-3 border border-gray-600 bg-navyDark focus:outline-none focus:ring-2 focus:ring-creamyLight text-gray-300 rounded-md" required
               ></textarea>
             </div>
 
