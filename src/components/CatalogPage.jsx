@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiTrash2 } from "react-icons/fi";
 import notFoundImage from "./assets/not-found.gif";
 import { toast } from "react-toastify";
 
@@ -13,13 +13,29 @@ function CatalogPage() {
   const [visibleProducts, setVisibleProducts] = useState(12);
   const [cart, setCart] = useState([]);
   const [checkoutInfo, setCheckoutInfo] = useState({
-    name: "",
-    date: "",
     phone: "",
+    pickupDate: "",
+    pickupTime: "",
   });
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupProduct, setPopupProduct] = useState(null);
   const [popupQuantity, setPopupQuantity] = useState(1);
+  const getMinDate = () => {
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Keep adding days until we find a weekday
+    while (!isWeekday(tomorrow)) {
+      tomorrow.setDate(tomorrow.getDate() + 1);
+    }
+
+    return tomorrow.toISOString().split("T")[0];
+  };
+
+  const isWeekday = (date) => {
+    const day = new Date(date).getDay();
+    return day !== 0 && day !== 6; // 0 is Sunday, 6 is Saturday
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -51,6 +67,10 @@ function CatalogPage() {
   };
 
   const handleAddToCart = (product, quantity) => {
+    if (!localStorage.getItem("userToken")) {
+      toast.error("Silakan login terlebih dahulu untuk melakukan pemesanan");
+      return;
+    }
     const existingProduct = cart.find((item) => item.product.id === product.id);
     if (existingProduct) {
       existingProduct.quantity += quantity;
@@ -67,8 +87,31 @@ function CatalogPage() {
   };
 
   const handleCheckout = async () => {
-    if (!checkoutInfo.name || !checkoutInfo.phone || !checkoutInfo.date) {
-      toast.warn("Isi semuanya terlebih dahulu.", {
+    if (
+      !checkoutInfo.phone ||
+      !checkoutInfo.pickupDate ||
+      !checkoutInfo.pickupTime
+    ) {
+      toast.warn("Mohon isi semua informasi pengambilan", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      return;
+    }
+
+    const pickupDateTime = new Date(
+      `${checkoutInfo.pickupDate}T${checkoutInfo.pickupTime}`
+    );
+    const pickupHour = pickupDateTime.getHours();
+
+    if (pickupHour > 14) {
+      toast.error("Waktu pengambilan maksimal hingga pukul 14:00", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -82,13 +125,17 @@ function CatalogPage() {
     }
 
     try {
+      const username = localStorage.getItem("username");
+
       for (const item of cart) {
         await axios.post("http://localhost:5000/api/orders", {
           product_id: item.product.id,
           quantity: item.quantity,
           total_price: item.product.price * item.quantity,
-          customer: checkoutInfo.name,
+          customer: username, // Use username instead of manual input
           phone: checkoutInfo.phone,
+          pickup_date: checkoutInfo.pickupDate,
+          pickup_time: checkoutInfo.pickupTime,
         });
       }
 
@@ -103,7 +150,7 @@ function CatalogPage() {
         theme: "colored",
       });
       setCart([]);
-      setCheckoutInfo({ name: "", phone: "", date: "" });
+      setCheckoutInfo({ phone: "", pickupDate: "", pickupTime: "" });
     } catch (error) {
       console.error(
         "Error during checkout:",
@@ -262,10 +309,11 @@ function CatalogPage() {
                     </span>
                     {/* Tombol Delete */}
                     <button
-                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition-colors duration-200"
-                      onClick={() => removeFromCart(index)} // Panggil fungsi hapus
+                      className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors duration-200"
+                      onClick={() => removeFromCart(index)}
+                      title="Hapus"
                     >
-                      Hapus
+                      <FiTrash2 size={16} />
                     </button>
                   </div>
                 </div>
@@ -286,16 +334,7 @@ function CatalogPage() {
               </div>
 
               {/* Form Checkout */}
-              <div className="mt-4">
-                <input
-                  type="text"
-                  placeholder="Nama"
-                  value={checkoutInfo.name}
-                  onChange={(e) =>
-                    setCheckoutInfo({ ...checkoutInfo, name: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded mb-2"
-                />
+              <div className="mt-4 space-y-4">
                 <input
                   type="text"
                   placeholder="No. WhatsApp"
@@ -306,24 +345,77 @@ function CatalogPage() {
                       .slice(0, 13);
                     setCheckoutInfo({ ...checkoutInfo, phone: value });
                   }}
-                  className="w-full px-4 py-2 rounded mb-2"
+                  className="w-full px-4 py-2 rounded bg-white/10 border border-white/20 text-white placeholder-gray-400"
                   maxLength={13}
                 />
-                <input
-                  type="date"
-                  value={checkoutInfo.date}
-                  onChange={(e) =>
-                    setCheckoutInfo({ ...checkoutInfo, date: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded mb-4"
-                />
-                <p className="text-white font-bold mb-2">Metode Pembayaran</p>
-                <label className="flex items-center text-white font-normal mb-4">
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-white text-sm font-medium mb-2">
+                      Tanggal Pengambilan
+                    </label>
+                    <input
+                      type="date"
+                      value={checkoutInfo.pickupDate}
+                      min={getMinDate()}
+                      onChange={(e) => {
+                        const selectedDate = new Date(e.target.value);
+                        if (isWeekday(selectedDate)) {
+                          setCheckoutInfo({
+                            ...checkoutInfo,
+                            pickupDate: e.target.value,
+                          });
+                        } else {
+                          toast.error(
+                            "Pengambilan hanya tersedia pada hari Senin - Jumat",
+                            {
+                              position: "top-right",
+                              autoClose: 3000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                              theme: "colored",
+                            }
+                          );
+                        }
+                      }}
+                      className="w-full px-4 py-2 rounded bg-white/10 border border-white/20 text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-white text-sm font-medium mb-2">
+                      Jam Pengambilan
+                    </label>
+                    <input
+                      type="time"
+                      value={checkoutInfo.pickupTime}
+                      min="08:00"
+                      max="14:00"
+                      onChange={(e) =>
+                        setCheckoutInfo({
+                          ...checkoutInfo,
+                          pickupTime: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2 rounded bg-white/10 border border-white/20 text-white"
+                    />
+                    <p className="text-sm text-gray-400 mt-1">
+                      Pengambilan tersedia Senin-Jumat, 08:00 - 14:00
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-white font-bold">Metode Pembayaran</p>
+                <label className="flex items-center text-white font-normal">
                   <input type="checkbox" className="mr-2" checked disabled />
                   Pembayaran Cash On Delivery
                 </label>
+
                 <button
-                  className="bg-creamyLight text-snavy px-4 py-2 rounded w-full hover:bg-creamy transition"
+                  className="bg-creamyLight text-snavy px-4 py-2 rounded w-full hover:bg-creamy transition-colors"
                   onClick={handleCheckout}
                 >
                   Checkout
@@ -393,64 +485,88 @@ function CatalogPage() {
           </div>
         )}
 
-        {popupVisible && popupProduct && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" // z-50 untuk overlay
-          >
-            <div
-              className="bg-white rounded-lg shadow-lg w-96 p-6 relative z-50" // z-50 untuk konten popup
+{popupVisible && popupProduct && (
+  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative z-50 transform transition-all duration-300 scale-100">
+      {/* Close Button */}
+      <button 
+        onClick={() => setPopupVisible(false)}
+        className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      {/* Product Image with Gradient Overlay */}
+      <div className="relative mb-4 rounded-lg overflow-hidden">
+        <img
+          src={`http://localhost:5000${popupProduct.image_url}`}
+          alt={popupProduct.name}
+          className="w-full h-64 object-cover transition-transform hover:scale-105 duration-300"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+      </div>
+
+      {/* Product Details */}
+      <div className="space-y-4">
+        <h4 className="text-2xl font-bold text-gray-800">{popupProduct.name}</h4>
+        
+        <p className="text-gray-600 text-sm leading-relaxed max-h-24 overflow-y-auto custom-scrollbar">
+          {popupProduct.description}
+        </p>
+        
+        <div className="flex items-center justify-between">
+          <p className="text-2xl font-bold text-snavy">
+            Rp {popupProduct.price.toLocaleString("id-ID")}
+          </p>
+        </div>
+
+        {/* Quantity Selector */}
+        <div className="flex items-center space-x-4">
+          <span className="text-gray-700 font-medium">Jumlah:</span>
+          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+            <button
+              onClick={decrement}
+              className="px-4 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
             >
-              <h4 className="text-xl font-bold mb-4">{popupProduct.name}</h4>
-              <img
-                src={`http://localhost:5000${popupProduct.image_url}`}
-                alt={popupProduct.name}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <p className="overflow-auto max-h-10 pt-3">
-                {popupProduct.description}
-              </p>
-              <p className="text-lg font-semibold my-4">
-                Rp {popupProduct.price.toLocaleString("id-ID")}
-              </p>
-              <div className="flex items-center mb-4">
-                <label className="mr-2">Jumlah</label>
-                <button
-                  onClick={decrement}
-                  className="px-2 py-1 bg-gray-200 text-gray-700 rounded-l hover:bg-gray-300 focus:outline-none"
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  min="1"
-                  value={popupQuantity}
-                  onChange={handleChange}
-                  className="w-16 px-2 py-1 border text-center focus:outline-none"
-                />
-                <button
-                  onClick={increment}
-                  className="px-2 py-1 bg-gray-200 text-gray-700 rounded-r hover:bg-gray-300 focus:outline-none"
-                >
-                  +
-                </button>
-              </div>
-              <div className="flex justify-between">
-                <button
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded"
-                  onClick={() => setPopupVisible(false)}
-                >
-                  Batal
-                </button>
-                <button
-                  className="bg-creamyLight text-snavy px-4 py-2 rounded"
-                  onClick={() => handleAddToCart(popupProduct, popupQuantity)}
-                >
-                  Tambah ke Keranjang
-                </button>
-              </div>
-            </div>
+              -
+            </button>
+            <input
+              type="number"
+              min="1"
+              value={popupQuantity}
+              onChange={handleChange}
+              className="w-16 px-2 py-2 text-center focus:outline-none text-gray-700"
+            />
+            <button
+              onClick={increment}
+              className="px-4 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+            >
+              +
+            </button>
           </div>
-        )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 pt-4">
+          <button
+            className="flex-1 px-4 py-3 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors"
+            onClick={() => setPopupVisible(false)}
+          >
+            Batal
+          </button>
+          <button
+            className="flex-1 px-4 py-3 rounded-lg bg-creamyLight text-snavy font-medium hover:bg-creamy transition-colors"
+            onClick={() => handleAddToCart(popupProduct, popupQuantity)}
+          >
+            Masukan Keranjang
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       </div>
 
       {/* Waves Transition */}
@@ -461,7 +577,7 @@ function CatalogPage() {
           viewBox="0 0 1440 320"
         >
           <path
-            fill="#3E5879" /* bg-navyDark */
+            fill="#1d2040"
             fillOpacity="1"
             d="M0,256L48,245.3C96,235,192,213,288,213.3C384,213,480,235,576,229.3C672,224,768,192,864,186.7C960,181,1056,203,1152,208C1248,213,1344,203,1392,197.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
           ></path>

@@ -29,6 +29,24 @@ html {
     pointer-events: none;
     z-index: -1;
   }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
   
   @keyframes moveParticles {
     0% {
@@ -59,5 +77,196 @@ html {
     input[type="number"]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
+    }
+  }
+
+  .rank-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  /* Elite Tier Badges */
+  .badge-eternal {
+    background: linear-gradient(45deg, #FF1493, #9400D3, #FF00FF, #8A2BE2);
+    background-size: 300% 300%;
+    color: white;
+    animation: eternal-shine 2s linear infinite, badge-float 3s ease-in-out infinite;
+    text-shadow: 
+      0 0 10px rgba(255,20,147,0.8),
+      0 0 20px rgba(148,0,211,0.5);
+    border: 2px solid rgba(255,255,255,0.5);
+    box-shadow: 
+      0 0 15px rgba(255,20,147,0.5),
+      inset 0 0 10px rgba(148,0,211,0.3);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    z-index: 1;
+  }
+  
+  .badge-celestial {
+    background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00, #DAA520);
+    background-size: 300% 300%;
+    color: #ffffff;
+    animation: celestial-glow 3s ease infinite, badge-float 4s ease-in-out infinite;
+    border: 2px solid rgba(255,215,0,0.5);
+    box-shadow: 
+      0 0 12px rgba(255,215,0,0.5),
+      inset 0 0 8px rgba(255,165,0,0.3);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(3px);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
+  }
+  
+  .badge-mythril {
+    background: linear-gradient(45deg, #00CED1, #20B2AA, #48D1CC, #40E0D0);
+    background-size: 300% 300%;
+    color: white;
+    animation: mythril-pulse 4s ease infinite, badge-float 5s ease-in-out infinite;
+    border: 2px solid rgba(0,206,209,0.5);
+    box-shadow: 
+      0 0 10px rgba(0,206,209,0.5),
+      inset 0 0 8px rgba(32,178,170,0.3);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(2px);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(64,224,208,0.8);
+  }
+
+.badge-sparkles {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at top left, transparent 95%, white 100%),
+    radial-gradient(circle at bottom right, transparent 95%, white 100%);
+  background-size: 4px 4px;
+  animation: sparkle 1.5s linear infinite;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+}
+  
+  /* Standard Tier Badges */
+  .badge-emerald {
+    background: linear-gradient(45deg, #50c878, #3cb371);
+    color: white;
+    box-shadow: 0 0 8px rgba(80,200,120,0.4);
+  }
+  
+  .badge-diamond {
+    background: linear-gradient(45deg, #b9f2ff, #89cff0);
+    color: #104e8b;
+    box-shadow: 0 0 8px rgba(185,242,255,0.4);
+  }
+  
+  .badge-platinum {
+    background: linear-gradient(45deg, #e5e4e2, #c0c0c0);
+    color: #104e8b;
+  }
+  
+  .badge-gold {
+    background: linear-gradient(45deg, #ffd700, #daa520);
+    color: #8b4513;
+  }
+  
+  .badge-silver {
+    background: linear-gradient(45deg, #c0c0c0, #a9a9a9);
+    color: #2f4f4f;
+  }
+  
+  .badge-bronze {
+    background: linear-gradient(45deg, #cd7f32, #a0522d);
+    color: white;
+  }
+  
+  .badge-user {
+    background: #e2e8f0;
+    color: #64748b;
+  }
+  
+  /* Animations */
+  @keyframes badge-float {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-3px) rotate(1deg);
+    }
+  }
+  
+  @keyframes sparkle {
+    0% {
+      background-position: 0 0;
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      background-position: 4px 4px;
+      opacity: 0.5;
+    }
+  }
+  
+  @keyframes eternal-shine {
+    0% {
+      background-position: 0% 50%;
+      text-shadow: 
+        0 0 10px rgba(255,20,147,0.8),
+        0 0 20px rgba(148,0,211,0.5);
+    }
+    50% {
+      background-position: 100% 50%;
+      text-shadow: 
+        0 0 15px rgba(255,0,255,0.9),
+        0 0 25px rgba(138,43,226,0.6);
+    }
+    100% {
+      background-position: 0% 50%;
+      text-shadow: 
+        0 0 10px rgba(255,20,147,0.8),
+        0 0 20px rgba(148,0,211,0.5);
+    }
+  }
+  
+  @keyframes celestial-glow {
+    0% {
+      background-position: 0% 50%;
+      filter: brightness(1) saturate(1);
+    }
+    50% {
+      background-position: 100% 50%;
+      filter: brightness(1.3) saturate(1.2);
+    }
+    100% {
+      background-position: 0% 50%;
+      filter: brightness(1) saturate(1);
+    }
+  }
+  
+  @keyframes mythril-pulse {
+    0% {
+      background-position: 0% 50%;
+      filter: brightness(1) saturate(1);
+    }
+    50% {
+      background-position: 100% 50%;
+      filter: brightness(1.2) saturate(1.1);
+    }
+    100% {
+      background-position: 0% 50%;
+      filter: brightness(1) saturate(1);
     }
   }
