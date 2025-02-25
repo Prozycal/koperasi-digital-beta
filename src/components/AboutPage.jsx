@@ -168,7 +168,7 @@ function AboutPage() {
       {/* Features Section */}
       <div className="container mx-auto px-6 mt-20">
         <h2 className="text-4xl font-extrabold mb-5 text-left text-transparent bg-clip-text bg-creamyLight">
-          Fitur Kami
+          Keunggulan Kami
         </h2>
         <motion.div
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
@@ -185,43 +185,6 @@ function AboutPage() {
           }}
         >
           {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              className="bg-snavy rounded-lg shadow-lg p-6 flex flex-col items-center text-center hover:scale-105 transition-transform duration-300"
-              variants={{
-                hidden: { opacity: 0, y: 50 },
-                visible: { opacity: 1, y: 0 },
-              }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-              <p className="text-gray-200">{feature.description}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Planned Features Section */}
-      <div className="container mx-auto px-6 mt-20">
-        <h2 className="text-4xl font-extrabold text-left mb-5 text-transparent bg-clip-text bg-creamyLight">
-          Fitur yang Direncanakan
-        </h2>
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={{
-            hidden: { opacity: 0, y: 50 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { staggerChildren: 0.2, ease: "easeOut" },
-            },
-          }}
-        >
-          {plannedFeatures.map((feature, index) => (
             <motion.div
               key={index}
               className="bg-snavy rounded-lg shadow-lg p-6 flex flex-col items-center text-center hover:scale-105 transition-transform duration-300"

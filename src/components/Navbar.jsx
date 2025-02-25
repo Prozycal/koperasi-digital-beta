@@ -88,6 +88,7 @@ function Navbar() {
     { href: '/#catalog', label: 'Catalog' },
     { href: '/#top', label: 'Rank' },
     { href: '/#contact', label: 'Contact' },
+    { href: '/play', label: 'Games' },
   ];
   
 

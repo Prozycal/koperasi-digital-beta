@@ -17,6 +17,7 @@ import UserSettingsPage from "./pages/UserSettingsPage";
 import AdminRoute from "./components/AdminRoute";
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import TopSpendersPage from './components/TopSpendersPage';
+import PongGame from './pages/PongGame';
 
 
 function App() {
@@ -50,6 +51,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+  path="/play"
+  element={
+    <ProtectedRoute>
+      <Navbar />
+      <PongGame />
+    </ProtectedRoute>
+  }
+/>
         
 <Route
           path="/orders"
