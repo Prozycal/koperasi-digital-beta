@@ -128,12 +128,12 @@ const PongGame = () => {
     
     // Improved paddle object with better mobile control
     const paddle = {
-      width: Math.min(canvas.width * 0.2, 100), // Responsive paddle width
+      width: Math.min(canvas.width * 0.2, 100),
       height: 10,
       x: canvas.width / 2 - 50,
       y: canvas.height - 20,
-      speed: 8,
-      targetX: canvas.width / 2 - 50, // For smooth movement
+      speed: 12, // Increased speed for more responsive feeling
+      targetX: canvas.width / 2 - 50
     };
   
     const ball = {
@@ -149,29 +149,41 @@ const PongGame = () => {
     // Improved touch/mouse handling
     const handleMove = (e) => {
       const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
-      if (x) {
-        paddle.targetX = Math.max(0, Math.min(x - paddle.width / 2, canvas.width - paddle.width));
+      const scaleX = canvas.width / rect.width; // Calculate scale factor
+      
+      let touchX;
+      if (e.touches) {
+        // Touch event
+        touchX = (e.touches[0].clientX - rect.left) * scaleX;
+      } else {
+        // Mouse event
+        touchX = (e.clientX - rect.left) * scaleX;
       }
+  
+      // Allow paddle to reach screen edges
+      paddle.targetX = Math.max(0, Math.min(touchX - paddle.width / 2, canvas.width - paddle.width));
     };
   
-    // Add touch start handler for mobile
+    // Prevent default touch behaviors
     const handleTouchStart = (e) => {
       e.preventDefault();
       handleMove(e);
     };
   
-    canvas.addEventListener('mousemove', handleMove);
+    // Add touch event listeners with options
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
     canvas.addEventListener('touchmove', handleMove, { passive: true });
-    canvas.addEventListener('touchstart', handleTouchStart);
+    canvas.addEventListener('mousemove', handleMove);
   
-    // Improved game loop with smooth paddle movement and better physics
+    // Improved game loop with smoother paddle movement
     const gameLoop = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
   
       // Smooth paddle movement
       const paddleDiff = paddle.targetX - paddle.x;
-      paddle.x += paddleDiff * 0.2; // Smooth follow
+    const easing = Math.abs(paddleDiff) > 50 ? 0.3 : 0.15; // Faster for large movements
+    paddle.x += paddleDiff * easing;
+    paddle.x = Math.max(0, Math.min(paddle.x, canvas.width - paddle.width));
   
       // Draw paddle with glow effect
       ctx.fillStyle = '#4FD1C5';
@@ -253,7 +265,7 @@ if (ball.frameCount >= DIFFICULTY_INCREASE_INTERVAL) {
       }
   
       animationFrameId = requestAnimationFrame(gameLoop);
-    };
+  };
   
     gameLoop();
   
@@ -382,7 +394,7 @@ const createDefaultProfileIcon = () => {
           <h1 className="text-4xl font-bold text-white mb-2">
             Konest <span className="text-creamyLight">Play!</span>
           </h1>
-          <p className="text-gray-400">Hit the ball to earn Konest Points!</p>
+          <p className="text-gray-400">Pantulkan bolanya untuk mendapat Konest Points!</p>
         </div>
 
         <div className="bg-navyDark rounded-xl p-6 shadow-lg">
@@ -390,7 +402,7 @@ const createDefaultProfileIcon = () => {
           {/* Score Display */}
           <div className="flex justify-between items-center mb-4">
           <div className="text-white">
-            <p className="text-sm opacity-70">Current Score</p>
+            <p className="text-sm opacity-70">Score</p>
             <p className="text-2xl font-bold">{score}</p>
           </div>
           <div className="text-white text-right">
@@ -409,12 +421,13 @@ const createDefaultProfileIcon = () => {
         <div className="mb-4 text-center">
           {timeUntilReset ? (
             <div className="bg-red-500/10 text-red-300 rounded-lg p-3">
-              <p className="text-sm mb-1">Daily limit reached! Play again in:</p>
+              <p className="text-sm mb-1">
+              Limit harian tercapai! Main lagi pada:</p>
               <p className="font-mono font-bold">{formatTimeRemaining(timeUntilReset)}</p>
             </div>
           ) : (
             <div className="bg-green-500/10 text-green-300 rounded-lg p-3">
-              <p className="text-sm mb-1">Plays remaining today:</p>
+              <p className="text-sm mb-1">Sisa permainan hari ini:</p>
               <p className="font-bold text-lg">{playsRemaining}</p>
             </div>
           )}
@@ -422,12 +435,18 @@ const createDefaultProfileIcon = () => {
 
         {/* Disable game start if no plays remaining */}
         <div className="relative rounded-lg overflow-hidden">
-          <canvas
-            ref={canvasRef}
-            width={600}
-            height={400}
-            className="w-full bg-navyDarkest"
-          />
+        <canvas
+    ref={canvasRef}
+    width={600}
+    height={400}
+    className="w-full bg-navyDarkest touch-none" // Add touch-none
+    style={{ 
+      touchAction: 'none', // Prevent default touch actions
+      WebkitTouchCallout: 'none', // Disable callout on iOS
+      WebkitUserSelect: 'none', // Disable selection
+      userSelect: 'none'
+    }}
+  />
 
           {(!gameStarted || timeUntilReset) && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -443,8 +462,8 @@ const createDefaultProfileIcon = () => {
                   }`}
               >
                 {timeUntilReset
-                  ? 'Come back tomorrow!'
-                  : score > 0 ? 'Play Again' : 'Start Game'}
+                  ? 'Kembali lagi besok!'
+                  : score > 0 ? 'Ulangi' : 'Mulai'}
               </motion.button>
             </div>
           )}
@@ -494,12 +513,12 @@ const createDefaultProfileIcon = () => {
 
           {/* Instructions */}
           <div className="mt-4 text-gray-400 text-sm">
-            <p className="mb-2">Instructions:</p>
+            <p className="mb-2">Cara Bermain:</p>
             <ul className="list-disc list-inside space-y-1 opacity-70">
-              <li>Move your mouse or finger to control the paddle</li>
-              <li>Hit the ball to earn 1 KP</li>
-              <li>Ball speed increases with each hit</li>
-              <li>Try to keep the ball in play as long as possible</li>
+              <li>Gerakkan mouse atau jarimu untuk mengontrol paddle</li>
+              <li>Setiap pantulan akan mendapat 1 KP</li>
+              <li>Kecepatan bola meningkat dengan setiap pantulan</li>
+              <li>Usahakan agar bola tetap dimainkan selama mungkin!</li>
             </ul>
           </div>
         </div>

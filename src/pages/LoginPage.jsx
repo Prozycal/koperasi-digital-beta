@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import logo from '../components/assets/navy-icon.png';
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const LoginPage = () => {
     username: "",
     password: "",
   });
+const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('userToken');
@@ -111,18 +113,31 @@ const handleLogin = async (e) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-snavy focus:border-transparent"
-              required
-            />
-          </div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Password
+  </label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={form.password}
+      onChange={handleInputChange}
+      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-snavy focus:border-transparent"
+      required
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+    >
+      {showPassword ? (
+        <AiOutlineEyeInvisible size={20} />
+      ) : (
+        <AiOutlineEye size={20} />
+      )}
+    </button>
+  </div>
+</div>
 
           <button
             type="submit"

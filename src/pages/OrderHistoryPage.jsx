@@ -8,7 +8,7 @@ function OrderHistoryPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [sortOption, setSortOption] = useState('newest');
   const itemsPerPage = 10;
-  const adminWhatsApp = "1234567890"; // Replace with actual admin number
+  const adminWhatsApp = "81215219801"; // Replace with actual admin number
 
   // Move useEffect out of fetchOrders
   useEffect(() => {

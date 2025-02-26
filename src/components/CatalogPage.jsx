@@ -432,17 +432,29 @@ function CatalogPage() {
             {filteredProducts.slice(0, visibleProducts).map((product) => (
               <div
                 key={product.id}
-                className="bg-navyDarkest rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                className={`bg-navyDarkest rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow
+            ${product.is_out_of_stock ? "opacity-75" : ""}`}
               >
-                <img
-                  src={
-                    product.image_url
-                      ? `http://localhost:5000${product.image_url}`
-                      : notFoundImage
-                  }
-                  alt={product.name}
-                  className="w-full h-48 object-cover"
-                />
+                <div className="relative">
+                  <img
+                    src={
+                      product.image_url
+                        ? `http://localhost:5000${product.image_url}`
+                        : notFoundImage
+                    }
+                    alt={product.name}
+                    className={`w-full h-48 object-cover ${
+                      product.is_out_of_stock ? "filter grayscale" : ""
+                    }`}
+                  />
+                  {product.is_out_of_stock && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                      <span className="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold">
+                        Stok Kosong
+                      </span>
+                    </div>
+                  )}
+                </div>
                 <div className="p-4">
                   <h4 className="font-bold text-white">{product.name}</h4>
                   <p className="text-sm text-sbeige overflow-hidden max-h-10">
@@ -452,10 +464,18 @@ function CatalogPage() {
                     Rp {product.price.toLocaleString("id-ID")}
                   </p>
                   <button
-                    className="bg-creamyLight text-snavy px-4 py-2 rounded mt-4 w-full hover:bg-creamy transition font-semibold"
-                    onClick={() => handleShowPopup(product)}
+                    className={`px-4 py-2 rounded mt-4 w-full font-semibold transition
+                    ${
+                      product.is_out_of_stock
+                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                        : "bg-creamyLight text-snavy hover:bg-creamy"
+                    }`}
+                    onClick={() =>
+                      !product.is_out_of_stock && handleShowPopup(product)
+                    }
+                    disabled={product.is_out_of_stock}
                   >
-                    Pesan
+                    {product.is_out_of_stock ? "Stok Kosong" : "Pesan"}
                   </button>
                 </div>
               </div>
@@ -485,88 +505,100 @@ function CatalogPage() {
           </div>
         )}
 
-{popupVisible && popupProduct && (
-  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative z-50 transform transition-all duration-300 scale-100">
-      {/* Close Button */}
-      <button 
-        onClick={() => setPopupVisible(false)}
-        className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+        {popupVisible && popupProduct && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative z-50 transform transition-all duration-300 scale-100">
+              {/* Close Button */}
+              <button
+                onClick={() => setPopupVisible(false)}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
 
-      {/* Product Image with Gradient Overlay */}
-      <div className="relative mb-4 rounded-lg overflow-hidden">
-        <img
-          src={`http://localhost:5000${popupProduct.image_url}`}
-          alt={popupProduct.name}
-          className="w-full h-64 object-cover transition-transform hover:scale-105 duration-300"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-      </div>
+              {/* Product Image with Gradient Overlay */}
+              <div className="relative mb-4 rounded-lg overflow-hidden">
+                <img
+                  src={`http://localhost:5000${popupProduct.image_url}`}
+                  alt={popupProduct.name}
+                  className="w-full h-64 object-cover transition-transform hover:scale-105 duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              </div>
 
-      {/* Product Details */}
-      <div className="space-y-4">
-        <h4 className="text-2xl font-bold text-gray-800">{popupProduct.name}</h4>
-        
-        <p className="text-gray-600 text-sm leading-relaxed max-h-24 overflow-y-auto custom-scrollbar">
-          {popupProduct.description}
-        </p>
-        
-        <div className="flex items-center justify-between">
-          <p className="text-2xl font-bold text-snavy">
-            Rp {popupProduct.price.toLocaleString("id-ID")}
-          </p>
-        </div>
+              {/* Product Details */}
+              <div className="space-y-4">
+                <h4 className="text-2xl font-bold text-gray-800">
+                  {popupProduct.name}
+                </h4>
 
-        {/* Quantity Selector */}
-        <div className="flex items-center space-x-4">
-          <span className="text-gray-700 font-medium">Jumlah:</span>
-          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-            <button
-              onClick={decrement}
-              className="px-4 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
-            >
-              -
-            </button>
-            <input
-              type="number"
-              min="1"
-              value={popupQuantity}
-              onChange={handleChange}
-              className="w-16 px-2 py-2 text-center focus:outline-none text-gray-700"
-            />
-            <button
-              onClick={increment}
-              className="px-4 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
-            >
-              +
-            </button>
+                <p className="text-gray-600 text-sm leading-relaxed max-h-24 overflow-y-auto custom-scrollbar">
+                  {popupProduct.description}
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <p className="text-2xl font-bold text-snavy">
+                    Rp {popupProduct.price.toLocaleString("id-ID")}
+                  </p>
+                </div>
+
+                {/* Quantity Selector */}
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-700 font-medium">Jumlah:</span>
+                  <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={decrement}
+                      className="px-4 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={popupQuantity}
+                      onChange={handleChange}
+                      className="w-16 px-2 py-2 text-center focus:outline-none text-gray-700"
+                    />
+                    <button
+                      onClick={increment}
+                      className="px-4 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    className="flex-1 px-4 py-3 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors"
+                    onClick={() => setPopupVisible(false)}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    className="flex-1 px-4 py-3 rounded-lg bg-creamyLight text-snavy font-medium hover:bg-creamy transition-colors"
+                    onClick={() => handleAddToCart(popupProduct, popupQuantity)}
+                  >
+                    Masukan Keranjang
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3 pt-4">
-          <button
-            className="flex-1 px-4 py-3 rounded-lg bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors"
-            onClick={() => setPopupVisible(false)}
-          >
-            Batal
-          </button>
-          <button
-            className="flex-1 px-4 py-3 rounded-lg bg-creamyLight text-snavy font-medium hover:bg-creamy transition-colors"
-            onClick={() => handleAddToCart(popupProduct, popupQuantity)}
-          >
-            Masukan Keranjang
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+        )}
       </div>
 
       {/* Waves Transition */}
